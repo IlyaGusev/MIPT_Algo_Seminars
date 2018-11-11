@@ -1,0 +1,95 @@
+\documentclass[10pt]{beamer}
+
+\usetheme{CambridgeUS}
+\usepackage[english, russian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{etoolbox}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{red},     % string literal style
+  showstringspaces=false,
+  morekeywords={include, printf},
+  texcl=true     %<---- added
+  numbersep=14pt
+}
+
+\title[\href{https://goo.gl/NRgp8K}{https://goo.gl/NRgp8K} (Term 3)]{R-ссылки; Move; Forward}
+\author[Зацепин Михаил]{Зацепин Михаил}
+\institute[МФТИ] 
+{Московский физико-технический институт\\*}
+\date{Москва, 2018}
+\subject{Computer Science}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\section{Вывод типов}
+\begin{frame}[fragile]{Вывод типов}
+Как работает вывод типов?
+\begin{lstlisting}[language=C++]
+    template<typename T>
+    void f(ParamType param);
+\end{lstlisting}
+\pause
+Пример:
+\begin{lstlisting}[language=C++]
+    template<typename T>
+    void f(const T& param);
+    
+    int value = 0;
+    f(value);
+\end{lstlisting}
+\pause
+Получаем, что \texttt{T=int; ParamType=const int\&}
+\end{frame}
+
+\section{Вывод типов}
+\begin{frame}[fragile]{ParamType - ссылка, указатель, но не \&\&}
+Если тип \texttt{expr} - ссылка, то ссылочная часть игнорируется. Далее сопоставление с ParamType:
+
+\begin{lstlisting}[language=C++]
+    template<typename T>
+    void f(T& param);
+    
+    int x = 0;
+    const int cx = x;
+    const int& rx = x;
+    
+    f(x);   // T=int;       ParamType=int\&
+    f(cx);  // T=const int; ParamType=const int\&
+    f(rx);  // T=const int; ParamType=const int\&
+\end{lstlisting}
+\end{frame}
+
+\section{Вывод типов}
+\begin{frame}[fragile]{ParamType - ссылка, указатель, но не \&\&}
+Если тип \texttt{expr} - ссылка, то ссылочная часть игнорируется. Далее сопоставление с ParamType:
+
+\begin{lstlisting}[language=C++]
+    template<typename T>
+    void f(const T& param);
+    
+    int x = 0;
+    const int cx = x;
+    const int& rx = x;
+    
+    f(x);   // T=int; ParamType=const int\&
+    f(cx);  // T=int; ParamType=const int\&
+    f(rx);  // T=int; ParamType=const int\&
+\end{lstlisting}
+\end{frame}
+
+\end{document}

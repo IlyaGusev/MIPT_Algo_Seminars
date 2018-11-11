@@ -1,0 +1,201 @@
+\documentclass[10pt]{beamer}
+
+\usetheme{CambridgeUS}
+\usepackage[english, russian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{etoolbox}
+\usepackage{multicol}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{red},     % string literal style
+  showstringspaces=false,
+  morekeywords={include, printf},
+  texcl=true     %<---- added
+}
+
+\title[\href{https://goo.gl/NRgp8K}{https://goo.gl/NRgp8K} (Term 3)]{Приведение типов}
+\author[Гусев Илья]{Гусев Илья}
+\institute[МФТИ] 
+{Московский физико-технический институт\\*}
+\date{Москва, 2087}
+\subject{Computer Science}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Содержание}
+\tableofcontents
+\end{frame}
+
+\section{Приведение типов}
+
+\subsection{static\_cast}
+\begin{frame}[fragile]{static\_cast}
+Можно:
+\begin{enumerate}
+    \item Преобразование указателя на родительский класс к указателю на дочерний класс. Объект по указателю обязан быть правильного дочернего класса, иначе undefined behaviour. 
+    \item Преобразования между числовыми типами. int, long, char, unsigned int — все их можно кастить друг в друга при помощи static\_cast.
+    \item Можно закастить любое выражение в void (ради побочных эффектов).
+    \item Можно привести константу nullptr к любому типу-указателю.
+\end{enumerate}
+Нельзя:
+\begin{enumerate}
+    \item Преобразование между указателями на в принципе несовместимые типы. Например, указатель на double нельзя привести к указателю на int.
+    \item Указатели на типы, а также сами типы с несовместимыми атрибутами const и/или volatile.
+    \item Привести указатель на функцию-член к указателю на обычную функцию, или указатель на код к указателю на данные.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{static\_cast - примеры}
+\begin{lstlisting}[language=C++]
+// Пример числовых преобразований.
+double a = 1.0;
+int b = static_cast<int>(a);
+
+// Пример каста вверх по иерархии.
+class A {};
+class B: public A{};
+B b;
+A* a = static_cast<A*>(&b);
+
+// Пример попытки снять константность.
+const int a = 1;
+int b = static_cast<int>(a); // Ошибка при компиляции!
+\end{lstlisting}
+\end{frame}
+
+\subsection{const\_cast}
+\begin{frame}[fragile]{const\_cast}
+\begin{enumerate}
+    \item Добавляет или убирает модификатор const/volatile у переменной.
+    \item Если вы изначально определили переменную как const, нельзя на ней использовать const\_cast, иначе UB!
+    \item Используется для вызовов правильных перегрузок, например.
+    \item Добавить const к неконстантному объекту могут также static\_cast и dynamic\_cast.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{const\_cast - примеры}
+\begin{lstlisting}[language=C++]
+int f(const int* a) {
+    int* b = const_cast<int*>( a );
+    (*b)++;
+    return *b;
+}
+
+const int c = 1;
+int i = 1;
+
+f(c); // UB.
+f(i); // Корректно.
+\end{lstlisting}
+\end{frame}
+
+\subsection{dynamic\_cast}
+\begin{frame}[fragile]{dynamic\_cast}
+\begin{enumerate}
+    \item Нужен для полиморфизма, используется только с классами с виртуальными функциями или виртуальным наследованием.
+    \item Если преобразование по иерархии действительно возможно (подходящий изначальный объект), оно произойдёт.
+    \item Если преобразование невозможно, и преобразовывались указатели, dynamic\_cast вернёт 0 или nullptr.
+    \item Если преобразование невозможно, и перобразовывались ссылки, dynamic\_cast кинет исключение std::bad\_cast.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{dynamic\_cast - примеры}
+\begin{lstlisting}[language=C++]
+struct A {
+    virtual ~A() {}
+};
+struct B : A {
+    int b = 1;
+};
+
+A a;
+B b;
+A* dynamic_b_a = dynamic_cast<A*>(&b); // OK.
+A* static_b_a = static_cast<A*>(&b); // OK.
+B* dynamic_a_b = dynamic_cast<B*>(&a); // 0.
+B* static_a_b = static_cast<B*>(&a); // UB.
+static_a_b->b; // Мусор.
+\end{lstlisting}
+\end{frame}
+
+
+\subsection{reinterpret\_cast}
+\begin{frame}[fragile]{reinterpret\_cast}
+\begin{enumerate}
+    \item Самое опасное преобразование, ипользуется для грязных хаков.
+    \item Напрямую превращает один тип в другой.
+    \item Ограничения: только pointer-to-pointer, reference-to-reference, pointer-to-integer, integer-to-pointer преобразования.
+    \item Гарантирует, что если преобразовать сначала в одну сторону, а потом обратно, то получится то же значение. Исключение - если размер типа, в который преобразовываем, меньше исходного.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{reinterpret\_cast}
+\begin{lstlisting}[language=C++]
+int a = 1;
+// Верхние 4 байта - мусор.
+double b = *reinterpret_cast<double*>(&a); // Случайное значение.
+
+if (sizeof(float) == sizeof(int)) {
+    int a = 1;
+    // Конкретное значение зависит от платформы.
+    // Размер типов, порядок байтов.
+    float b = *reinterpret_cast<float*>(&a); // 1.4013e-45
+}
+\end{lstlisting}
+\end{frame}
+
+\subsection{С-style cast}
+\begin{frame}[fragile]{C-style cast}
+Порядок вызова:
+\begin{enumerate}
+    \item const\_cast.
+    \item Если const\_cast не может дать нужный результат, то static\_cast (с игнорированием спецификатора приватного наследования).
+    \item Если и так не выходит, то компилятор пробует в хвост к static\_cast добавить const\_cast.
+    \item Если и это не получается, то reinterpret\_cast.
+    \item Если не выйдет, то к нему дописывается const\_cast.
+\end{enumerate}
+\end{frame}
+
+
+\appendix
+\section<presentation>*{\appendixname}
+\subsection<presentation>*{Useful links}
+
+\begin{frame}[allowframebreaks]
+  \frametitle<presentation>{Полезные ссылки}
+    
+  \begin{thebibliography}{10}
+{
+  \beamertemplatebookbibitems
+  % Start with overview books.
+  
+  \bibitem{SO1}
+  \texttt{StackOverflow: static\_cast}
+  \newblock \href{https://goo.gl/GTxYvz}{\texttt{https://ru.stackoverflow.com/questions/387985/Для-чего-\\нужен-static-cast-как-он-работает-и-где-его-применяют}}
+  
+  \bibitem{SO2}
+  \texttt{StackOverflow: When should static\_cast, dynamic\_cast, const\_cast and reinterpret\_cast be used?}
+  \newblock \href{https://goo.gl/HHvtjG}{\texttt{https://stackoverflow.com/questions/332030/when-should-static-\\cast-dynamic-cast-const-cast-and-reinterpret-cast-be-used}}
+  
+}
+    
+  \end{thebibliography}
+\end{frame}
+
+\end{document}
+
+

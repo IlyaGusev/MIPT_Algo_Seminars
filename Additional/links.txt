@@ -1,0 +1,3 @@
+https://stackoverflow.com/questions/9452701/ukkonens-suffix-tree-algorithm-in-plain-english/9513423#9513423 - разбор Укконена
+http://brenden.github.io/ukkonen-animation/ - визуализация Укконена (возможно неправильная)
+https://habr.com/post/251747/ - Сделай сам: MSc Computer Science на уровне топ американских университетов из дома

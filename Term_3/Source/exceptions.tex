@@ -1,0 +1,384 @@
+\documentclass[10pt]{beamer}
+
+\usetheme{CambridgeUS}
+\usepackage[english, russian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{etoolbox}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{red},     % string literal style
+  showstringspaces=false,
+  morekeywords={include, printf},
+  texcl=true     %<---- added
+}
+
+\title[\href{https://goo.gl/NRgp8K}{https://goo.gl/NRgp8K} (Term 3)]{Исключения}
+\author[Гусев Илья]{Гусев Илья}
+\institute[МФТИ] 
+{Московский физико-технический институт\\*}
+\date{Москва, 2018}
+\subject{Computer Science}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Содержание}
+\tableofcontents
+\end{frame}
+
+\section{Способы обработки ошибок}
+\begin{frame}[fragile]{Источники ошибок}
+\begin{enumerate}
+    \item Внешние источники - сбои в операционной системе, сбои в железе, ошибка соединения клиентской части с серверной.
+    \item Нехватка ресурсов: нехватка оперативной памяти, места на диске, ограничения на количество объектов.
+    \item Ошибки в логике программы.
+    \item Ошибки пользоавателя, например - неправильный ввод .
+    \item Классификация условная - куда отнести деление на 0?
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Способы обработки ошибок}
+\begin{enumerate}
+    \item Коды возврата — если функция возвращает true — все хорошо, если же false (или любое другое специальное значение) — то произошла ошибка. Иногда есть глобальная переменная с кодом ошибки (GetLastError(), errno).
+    \item Assert/abort — роняем программу или подпрограмму.
+    \item Исключения — прерывистый поток исполнения.
+\end{enumerate}
+\end{frame}
+
+\subsection{Коды возврата}
+\begin{frame}[fragile]{Коды возврата}
+\begin{lstlisting}[language=C++]
+int f1()
+{
+  // ...
+  int rc = f2();
+  if (rc == 0) {
+    // ...
+  } else {
+    // код, обрабатывающий ошибку
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+\subsection{assert}
+\begin{frame}[fragile]{assert}
+\begin{lstlisting}[language=C++]
+#include <cassert>
+
+int f1()
+{
+  // ...
+  int rc = f2();
+  assert(rc == 0);
+  // если rc != 0, сюда мы не попадём
+}
+\end{lstlisting}
+\end{frame}
+
+\subsection{Исключения}
+\begin{frame}[fragile]{Исключения}
+\begin{lstlisting}[language=C++]
+void f1()
+{
+  try {
+    // ...
+    f2();
+    // ...
+  } catch (some_exception& e) {
+    // код, обрабатывающий ошибку
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+\section{Исключения}
+\subsection{Синтаксис в C++}
+\begin{frame}[fragile]{Синтаксис в C++}
+\begin{lstlisting}[language=C++]
+// Кинуть исключение:
+throw 123;
+throw 'c';
+throw std::logic_error("Ошибка");
+
+// Поймать исключение:
+try {
+  // Код или вызовы функций, кидающие исключение
+} catch (int e) { // Вместо int - тип брошенного исключения
+  // Обработка ошибки
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Исключения}
+\begin{enumerate}
+    \item Исключение принудительно вызывает код, который распознаёт ошибку и обрабатывает его. Необработанные исключения остановливают выполнение программы.
+    \item Исключение переходит к точке в стеке вызовов, в которой можно обработать ошибку. Промежуточные функций пробрасывают исключение. Им не нужно общаться с другими функциями в стеке.
+    \item Механизм очистки стека исключений уничтожает все объекты в области видимости в соответствии с чётко определёнными правилами, после того, как исключение брошено.
+    \item Исключение обеспечивает четкое разделение между кодом, который обнаруживает ошибку и кодом, который обрабатывает ошибку.
+\end{enumerate}
+\end{frame}
+
+\subsection{Коды возврата vs исключения}
+\begin{frame}[fragile]{Коды возврата vs исключения}
+\begin{enumerate}
+\item Исключения не накладывают на программиста обязанности проверять каждый вызов каждой функции, чтобы не потерять случайно возникшую ошибку.
+\item Если ошибка не обработана на текущем уровне — ничего страшного, ей займется более верхний. Возможно, ему уже будет известно, что с ней делать.
+\item Поддерживаются самим языком — нам не нужно модифицировать существующий код, чтобы научить его пробрасывать ошибку наверх этим новым способом.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Минусы исключений}
+\begin{enumerate}
+\item Исключения дают рваный поток выполнения. По коду нельзя сказать куда улетит брошенное нами исключение и что может вывалится из того, что мы вызвали.
+\item Реальный путь исключения по стеку определяется не статическим описанием программы (сигнатуры методов с исключениями) а её динамической структурой (кто какие реализации вызывает).
+\item Исключения менее эффективны.
+\item При использовании исключений нужно очень аккуратно обращаться с динамической памятью, в идеале использовать Resource Acquisition Is Initialization (RAII).
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Коды возврата vs исключения}
+\begin{lstlisting}[language=C++]
+void f(Number x, Number y)
+{
+  try {
+    // ...
+    Number sum  = x + y;
+    Number diff = x - y;
+    Number prod = x * y;
+    Number quot = x / y;
+    // ...
+  }
+  catch (Number::Overflow& exception) {
+    // ...code that handles overflow...
+  }
+  catch (Number::Underflow& exception) {
+    // ...code that handles underflow...
+  }
+  catch (Number::DivideByZero& exception) {
+    // ...code that handles divide-by-zero...
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Коды возврата vs исключения}
+\begin{lstlisting}[language=C++]
+int f(Number x, Number y)
+{
+  // ...
+  Number::ReturnCode rc;
+  Number sum = x.add(y, rc);
+  if (rc == Number::Overflow) {
+    // ...code that handles overflow...
+    return -1;
+  } else if (rc == Number::Underflow) {
+    // ...code that handles underflow...
+    return -1;
+  } else if (rc == Number::DivideByZero) {
+    // ...code that handles divide-by-zero...
+    return -1;
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+\subsection{Исключения в конструкторах}
+\begin{frame}[fragile]{Исключения в конструкторах}
+\begin{enumerate}
+    \item У конструктора нет возвращаемого значения.
+    \item Практически единственный способ сообщить об ошибке - кинуть исключение.
+    \item Память будет очищена, для членов класса - вызван деструктор.
+    \item Для самого объекта деструктор вызван не будет.
+    \item Члены класса должны сами за собой подчищать (RAII).
+\end{enumerate}
+\end{frame}
+
+\subsection{Исключения в деструкторах}
+\begin{frame}[fragile]{Исключения в деструкторах}
+\begin{enumerate}
+    \item Исключения из деструктора практически никогда нельзя кидать. Почему?
+    \item Если в программе возникает исключение во время обработки другого исключения, происходит terminate().
+    \item При раскрутке стека вызываются деструкторы всех объектов на данном уровне стека.
+    \item Вывод?
+    \item Если используете какие-то функции внутри деструктора, и они кидают исключения - обрабатывайте исклчюения внутри деструктора.
+\end{enumerate}
+\end{frame}
+
+\subsection{Как кидать и ловить?}
+\begin{frame}[fragile]{Как кидать и ловить?}
+\begin{enumerate}
+    \item Исключение может любой тип.
+    \item Обычно тип исключения наследуют от std::exception или производных.
+    \item Ловить можно по: значению, ссылке, указателю.
+    \item Наиболее правильно - по ссылке.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Почему не по указателю?}
+\begin{lstlisting}[language=C++]
+MyException x;
+void f()
+{
+  MyException y;
+  try {
+    switch ((rand() >> 8) % 3) {
+      case 0: throw new MyException;
+      case 1: throw &x;
+      case 2: throw &y;
+    }
+  }
+  catch (MyException* p) {
+    // Здесь нам удалять p или нет?
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+\subsection{Что такое throw; и catch (...)?}
+\begin{frame}[fragile]{Что такое throw; и catch (...)?}
+\begin{lstlisting}[language=C++]
+void handleException()
+{
+  try {
+    throw; // пробросить текущее исключение дальше
+  }
+  catch (MyException& e) {
+    // обработка MyException
+  }
+  catch (YourException& e) {
+    // обработка YourException
+  }
+}
+void f()
+{
+  try {
+    // что-то, что кидает исключения
+  }
+  catch (...) { // ловит все исключения
+    handleException();
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+
+\subsection{Исключения и полиморфизм}
+\begin{frame}[fragile]{Исключения и полиморфизм}
+\begin{lstlisting}[language=C++]
+class MyExceptionBase { };
+class MyExceptionDerived : public MyExceptionBase { };
+void f(MyExceptionBase& e)
+{
+  // ...
+  throw e;
+}
+void g()
+{
+  MyExceptionDerived e;
+  try {
+    f(e);
+  }
+  catch (MyExceptionDerived& e) {
+    // обработка MyExceptionDerived
+  }
+  catch (...) {
+    // обработка остальных исключений
+    // поток выполнения пойдёт сюда
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+\subsection{Спецификации исклчючений}
+\begin{frame}[fragile]{Спецификации исклчючений}
+\begin{lstlisting}[language=C++]
+void f() throw(int); // OK: function declaration
+void (*fp)() throw (int); // OK: pointer to function declaration
+void g(void pfa() throw(int)); // OK: pointer to function parameter declaration
+typedef int (*pf)() throw(int); // Error: typedef declaration
+
+void f() throw() // не бросает исключений
+void f() throw(...) // может бросать исклчючения
+\end{lstlisting}
+Если функция кидает исключение, которое имеет тип, не указанный в спецификации, то вызывается std::unexpected. По умолчанию она вызывает std::terminate, но может быть заменена на пользовательскую функцию. \\
+Спецификация исключений в таком виде - довольно бесполезная и дорогая штука, планируют убрать из языка.
+\end{frame}
+
+\subsection{SEH}
+\begin{frame}[fragile]{SEH}
+\begin{enumerate}
+    \item Windows-only
+    \item Позволяют ловить исключения процессора: access violation, illegal instruction, divide by zero.
+    \item Механизм, отличный от исключений C++
+    \item Один компилятор. Одна ОС. Не «чистый С++». 
+\end{enumerate}
+\begin{lstlisting}[language=C++]
+__try 
+{
+   // guarded code
+}
+__except ( expression )
+{
+   // exception handler code
+}
+\end{lstlisting}
+\end{frame}
+
+\appendix
+\section<presentation>*{\appendixname}
+\subsection<presentation>*{Useful links}
+
+\begin{frame}[allowframebreaks]
+  \frametitle<presentation>{Полезные ссылки}
+    
+  \begin{thebibliography}{10}
+{
+  \beamertemplatebookbibitems
+  % Start with overview books.
+
+  \bibitem{faq}
+  \texttt{C++ FAQ: Exceptions}
+  \newblock \href{https://isocpp.org/wiki/faq/exceptions}{\texttt{https://isocpp.org/wiki/faq/exceptions}}
+  
+  \bibitem{habr1}
+  \texttt{Habr: Коды возврата vs исключения — битва за контроль ошибок}
+  \newblock \href{https://habrahabr.ru/post/130611/}{\texttt{https://habrahabr.ru/post/130611/}}
+  
+  \bibitem{habr2}
+  \texttt{Habr: Коды возврата & исключения}
+  \newblock \href{https://habrahabr.ru/post/131212/}{\texttt{https://habrahabr.ru/post/131212/}}
+  
+  \bibitem{habr3}
+  \texttt{Habr: Обработка Segmentation Fault в C++ (про SEH)}
+  \newblock \href{https://habrahabr.ru/post/131412/}{\texttt{https://habrahabr.ru/post/131412/}}
+  
+  \bibitem{msdn}
+  \texttt{MSDN: Обработка исключений С++}
+  \newblock \href{https://msdn.microsoft.com/ru-ru/library/4t3saedz.aspx}{\texttt{https://msdn.microsoft.com/ru-ru/library/4t3saedz.aspx}}
+  
+   \bibitem{cppref1}
+  \texttt{CppReference: dynamic exception specification}
+  \newblock \href{http://en.cppreference.com/w/cpp/language/except_spec}{\texttt{ http://en.cppreference.com/w/cpp/language/except_spec}}
+}
+    
+  \end{thebibliography}
+\end{frame}
+
+\end{document}
+
+

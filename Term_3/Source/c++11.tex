@@ -1,0 +1,624 @@
+\documentclass[10pt]{beamer}
+
+\usetheme{CambridgeUS}
+\usepackage[english, russian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{etoolbox}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{red},     % string literal style
+  showstringspaces=false,
+  morekeywords={include, printf},
+  texcl=true     %<---- added
+}
+
+\title[\href{https://goo.gl/NRgp8K}{https://goo.gl/NRgp8K} (Term 3)]{Краткое описание стандарта C\texttt{++}11}
+\author[Гусев Илья]{Гусев Илья}
+\institute[МФТИ] 
+{Московский физико-технический институт\\*}
+\date{Москва, 2017}
+\subject{Computer Science}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Содержание}
+\begin{multicols}{2}
+\tableofcontents
+\end{multicols}
+\end{frame}
+
+\begin{frame}{Список фич}
+\begin{itemize}
+\item{Упрощение:\\ \texttt{\textcolor{blue}{\hyperlink{Auto}{Auto}, \hyperlink{Array}{array}, \hyperlink{Tuple}{tuple},} forward\_list, \textcolor{red}{unordered containers}, \textcolor{blue}{\hyperlink{Range-for}{range-for statement}, \hyperlink{Regex}{regex}, \hyperlink{Nullptr}{nullptr}, \hyperlink{In-class member initializers}{in-class member initializers}}, raw string literals }}
+\item{Обобщение:\\ \texttt{\textcolor{blue}{\hyperlink{Uniform initialization}{Uniform initialization}, \hyperlink{Inherited constructors}{inherited constructors}, \hyperlink{Delegating constructors}{delegating constructors}, \hyperlink{Static assertions}{static assertions}}, \textcolor{green}{threads}, template alias, \textcolor{red}{variadic templates}}}
+\item{Расширение:\\ \texttt{\textcolor{blue}{\hyperlink{Lambdas}{Lambdas}, \hyperlink{Default and delete}{default and delete}, \hyperlink{Suffix return type}{suffix return type}, \hyperlink{Smart pointers}{smart pointers}, \hyperlink{Override-final}{override-final}}, enum class, constexpr, noexcept, user-defined literals, alignment, \textcolor{red}{rvalue}, \textcolor{green}{TLS, async, future-promise}}}
+\item{Исправление:\\ \texttt{\textcolor{blue}{Right-angle brackets}, unions, PODs}}
+\end{itemize}
+\end{frame}
+
+\section{Упрощение}
+
+\subsection{Auto}
+\hypertarget{Auto}{}
+\begin{frame}[fragile]{Auto}{Вывод типа в инициализаторе}
+Компилятор в состоянии предугадать тип пременной при её инициализации. Ключевое слово - auto. Пример:
+\begin{lstlisting}[language=C++]
+auto i = 7;
+\end{lstlisting}
+Компилятор понимает, что i - переменная типа int. Более сложный пример:
+\begin{lstlisting}[language=C++]
+template<class T, class U> void multiply(
+    const vector<T>& vt, 
+    const vector<U>& vu)
+{
+    auto tmp = vt[0] * vu[0];
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Auto}{Вывод типа в инициализаторе}
+Было:
+\begin{lstlisting}[language=C++]
+template<class T> void printall( const vector<T>& v )
+{
+    for( typename vector<T>::const_iterator p = v.begin(); 
+        p!=v.end(); ++p ) 
+    {
+        cout << *p << "\n";
+    }
+}
+\end{lstlisting}
+\vspace{5mm}
+Стало:
+\begin{lstlisting}[language=C++]
+template<class T> void printall( const vector<T>& v )
+{
+    for( auto p = v.begin(); p!=v.end(); ++p ) {
+        cout << *p << "\n";
+    }
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Auto}{Вывод типа в инициализаторе}
+Здесь же нужно упомянуть decltype. То, что раньше называлось typeof.
+\begin{lstlisting}[language=C++]
+
+void f( const vector<int>& a, vector<float>& b )
+{
+    typedef decltype( a[0] * b[0] ) Tmp;
+    for( int i = 0; i < b.size(); ++i ) {
+        Tmp* p = new Tmp( a[i] * b[i] );
+    }
+}
+\end{lstlisting}
+\end{frame}
+
+\subsection{Range-for}
+\hypertarget{Range-for}{}
+\begin{frame}[fragile]{Range-for statement}{Удобный цикл}
+ Аналог foreach цикла в других языках. Можно ипользовать для большинства стандартных контейнеров и для всего, где определён begin() и end(), в том числе и для пользовательских классов.
+\begin{lstlisting}[language=C++]
+void f( vector<double>& v )
+{
+    for( auto x : v ) cout << x << '\n';
+    // По ссылке можем менять значение.
+    for( auto& x : v ) ++x;	
+}
+\end{lstlisting}
+\end{frame}
+
+\subsection{Array}
+\hypertarget{Array}{}
+\begin{frame}[fragile]{Array}{Новый простой стандартный контейнер}
+ \begin{itemize}
+ \item{Элемент STL, std::array}
+ \item{Как обычный статический массив, но с поддержкой всех итераторных методов STL}
+ \item{Поддержка initializer list}
+ \item{Знает свой размер}
+ \item{Не спутать с указателем}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Array}{Новый простой стандартный контейнер}
+\begin{lstlisting}[language=C++]
+array<int, 6> a = { 1, 2, 3 };
+a[3] = 4;
+
+// x равен 0, потому что  по умолчанию элементы zero initialized.
+int x = a[5]; 
+
+// Error: std::array неявно не преобразовывается у указателю.
+int* p1 = a; 
+int* p2 = a.data(); // Ok: указатель на первый элемент.
+array<int> a3 = { 1, 2, 3 }; // Error: не указан размер.
+array<int, 0> a0; // Ok: пустой массив.
+int* p = a0.data(); // Unspecified; не делайте так.
+\end{lstlisting}
+\end{frame}
+
+
+\subsection{Tuple}
+\hypertarget{Tuple}{}
+\begin{frame}[fragile]{Tuple}{Кортеж в C\texttt{++}}
+\begin{itemize}
+\item{Элемент STL, std::tuple}
+ \item{Удобен для хранения разнородных объектов}
+ \item{Частный случай - std::pair}
+\end{itemize}
+\vspace{5mm}
+\begin{lstlisting}[language=C++]
+std::tuple<string,int> t2( "Word", 123 );
+// У t будет тип tuple<string,int,double>.
+auto t = make_tuple( string( "Letter" ), 10, 1.23 );	
+string s = get<0>(t);
+int x = get<1>(t);
+double d = get<2>(t);
+\end{lstlisting}
+\end{frame}
+
+\subsection{nullptr}
+\hypertarget{Nullptr}{}
+\begin{frame}[fragile]{nullptr}{Выделеныый нулевой указатель}
+\begin{lstlisting}[language=C++]
+char* p = nullptr;
+int* q = nullptr;
+char* p2 = 0; // 0 работает, p==p2.
+
+void f(int);
+void f(char*);
+f(0); // Вызов f(int).
+f(nullptr); // Вызов f(char*).
+
+void g(int);
+g(nullptr); // Error: nullptr не int.
+int i = nullptr; // Error: nullptr не int.
+\end{lstlisting}
+\end{frame}
+
+\subsection{In-class member initializers}
+\hypertarget{In-class member initializers}{}
+\begin{frame}[fragile]{In-class member initializers}{Инициализируем поля непосредственно в классе}
+\begin{lstlisting}[language=C++]
+class A {
+public:
+    int a = 7;
+};
+\end{lstlisting}
+эквивалентно
+\begin{lstlisting}[language=C++]
+class A {
+public:
+    int a;
+    A(): a(7) {}
+};
+\end{lstlisting}
+Если есть и то, и то - constructor initialization > in-class initialization.
+\end{frame}
+
+\subsection{Regex}
+\hypertarget{Regex}{}
+\begin{frame}[fragile]{Regex}{Регулярные выражения в C\texttt{++}}
+Семейство функций \texttt{regex\_replace, regex\_search, \\regex\_match}.
+
+\begin{lstlisting}[language=C++]
+std::string text = "Quick brown fox";
+std::regex vowel_re( "a|o|e|u|i" );
+std::regex_replace( text, vowel_re, "[X]" );
+// Q[X][X]ck br[X]wn f[X]x
+\end{lstlisting}
+\end{frame}
+
+\section{Обобщение}
+\subsection{Uniform initialization}
+\hypertarget{Uniform initialization}{}
+\begin{frame}[fragile]{Uniform initialization}{Одинаковая инцицализация в разных ситуациях}
+Новый тип - \texttt{std::initializer\_list<T>}. Любая длина списка, но один и тот же тип элементов.
+\begin{lstlisting}[language=C++]
+void f( initializer_list<int> );
+f( {1, 2} );
+f( {23, 345, 4567, 56789} );
+f({}); // Пустой список инициализации.
+f{ 1,2 }; // Error: нет () при вызове функцииы
+years.insert( { {"Bjarne", "Stroustrup"}, {1950, 1975, 1985} } );
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Uniform initialization}{Одинаковая инцицализация в разных ситуациях}
+Раньше:
+\begin{lstlisting}[language=C++]
+// Ok: можно использовать для стат. массивов
+string a[] = { "foo", " bar" }; 
+// Error: для std::vector уже нельзя
+vector<string> v = { "foo", " bar" }; 
+void f( string a[] );
+f( { "foo", " bar" } ); // Syntax error: block as argument
+
+int a = 2; // Обычное присваивание
+int aa[] = { 2, 3 }; // Обычное присваивание массиву
+complex z( 1, 2 ); // Инициализация в функциональном стиле
+// Инициализация в функциональном стиле с преобразованием типа
+x = Ptr(y); 
+
+int a(1); // Определение перременной.
+int b(); // Объявление переменной.
+int b(foo); // Определение перременной или объявление функции.
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Uniform initialization}{Одинаковая инцицализация в разных ситуациях}
+Теперь можно так:
+\begin{lstlisting}[language=C++]
+X x1 = X{ 1, 2 }; 
+X x2 = { 1, 2 };
+X x3{ 1, 2 }; 
+X* p = new X{1,2}; 
+
+struct D : X {
+    D( int x, int y ) :X{ x, y } {};
+};
+struct S {
+    int a[3];
+    S( int x, int y, int z ) :a{ x, y, z } {};
+};
+
+X x{a}; 
+X* p = new X{a};
+z = X{a};// Переобразование типа.
+f( {a} );// Аргумент функции (типа X).
+return {a}; // Возвращаемое значение функции (типа X)
+\end{lstlisting}
+\end{frame}
+
+\subsection{Inherited constructors}
+\hypertarget{Inherited constructors}{}
+\begin{frame}[fragile]{Inherited constructors}{Конструкторы базового класса в области видимости наследника}
+Была проблема:
+\begin{lstlisting}[language=C++]
+
+struct B {
+    void f(double);
+};
+struct D : B {
+    void f(int);
+};
+B b; b.f(4.5);	// Ок.
+// Неочивидная особенность: вызов f(int) с аргументом 4.
+D d; d.f(4.5);	
+\end{lstlisting}
+\end{frame}
+\begin{frame}[fragile]{Inherited constructors}{Конструкторы базового класса в области видимости наследника}
+И было решение:
+\begin{lstlisting}[language=C++]
+struct B {
+    void f(double);
+};
+struct D : B {
+    // Вносим все f() базового класса в область видимости.
+    using B::f; 
+    void f(int);
+};
+
+B b;   b.f(4.5);	// Ок.
+// Ок: вызов D::f(double), которая на самом деле B::f(double).
+D d;   d.f(4.5);	
+\end{lstlisting}
+\end{frame}
+\begin{frame}[fragile]{Inherited constructors}{Конструкторы базового класса в области видимости наследника}
+Раньше подобный трюк не работал с конструкторами, теперь работает.
+\begin{lstlisting}[language=C++]
+class Derived : public Base { 
+public: 
+    using Base::f;    // Работает в C++98.
+    void f(char);
+    
+    using Base::Base; // Работает только с C++11.
+    Derived(char);
+}; 
+\end{lstlisting}
+\end{frame}
+
+\subsection{Delegating constructors}
+\hypertarget{Delegating constructors}{}
+\begin{frame}[fragile]{Delegating constructors}{Вызов одного конструктора в другом}
+Раньше нужно было извернутсья, чтобы 2 конструктора разделяли какую-то функциональность:
+\begin{lstlisting}[language=C++]
+class X {
+    int a;
+    void init(int x) { /* ... */ }
+public:
+    X(int x) { init(x); }
+    X() { init(42); }
+};
+\end{lstlisting}
+Теперь всё просто:
+\begin{lstlisting}[language=C++]
+class X {
+    int a;
+public:
+    X(int x) { { /* ... */ }
+    X(): X{42} { }
+};
+\end{lstlisting}
+\end{frame}
+
+\subsection{Static assertions}
+\hypertarget{Static assertions}{}
+\begin{frame}[fragile]{Static assertions}{Проверки на этапе компиляции}
+Суть ясна, но не сразу понятно, зачем это нужно. Варианты использования - провекра платформы при компиляции и контроль целостности enum'ов.
+\begin{lstlisting}[language=C++]
+static_assert( sizeof(long) >= 8, 
+    "64-bit code generation required for this library." );
+struct S { X m1; Y m2; };
+static_assert( sizeof(S) == sizeof(X) + sizeof(Y), 
+    "unexpected padding in S" );
+
+int f(int* p, int n)
+{
+    // Error: не работает для runtime-проверок.
+    static_assert( p == 0, "p is not null" ); 
+}
+
+\end{lstlisting}
+\end{frame}
+
+\section{Расширение}
+\subsection{Lambdas}
+\hypertarget{Lambdas}{}
+\begin{frame}[fragile]{Lambdas}{Лямбда-функции}
+Безымянные функции, которые могут захватывать пременные из внешней по отношению к ним области видимости.
+\begin{lstlisting}[language=C++]
+vector<int> v = {50, -10, 20, -30};
+std::sort(v.begin(), v.end());
+// v: { -30, -10, 20, 50 }
+std::sort(v.begin(), v.end(), 
+    [](int a, int b) { return abs(a)<abs(b); });
+// v: { -10, 20, -30, 50 }
+\end{lstlisting}
+\end{frame}
+\begin{frame}[fragile]{Lambdas}{Лямбда-функции. Захват переменных}
+\texttt{[]} - нет захвата переменных.\\\texttt{[\&]} - захват всех переменных по ссылке.\\ \texttt{[=]} - захват всех переменных по значению.\\ \texttt{[\&a, \&b]} - захват a и b  по сслыке.\\ \texttt{[a, b]} - захват a и b по значению.\\\texttt{[in, \&out]} - захват in по значению, а out — по ссылке\\ \texttt{[=, \&out1, \&out2]} - захват всех переменных по значению, кроме out1 и out2, которые захватываются по ссылке.\\\texttt{[\&, x, \&y]} - захват всех переменных по ссылке, кроме x.
+\begin{lstlisting}[language=C++]
+void f( vector<Record>& v )
+{
+    vector<int> indices( v.size() );
+    int count = 0;
+    generate( indices.begin(), indices.end(), 
+        [&count](){ return count++; } );
+    std::sort( indices.begin(), indices.end(), 
+        [&](int a, int b) { return v[a].name<v[b].name; } );
+}
+\end{lstlisting}
+\end{frame}
+\begin{frame}[fragile]{Lambdas}{Лямбда-функции. Тип возвращаемого значения}
+По умолчанию лямбда возвращает void. При наличии одного return, компилятор вычисляет тип возвращаемого значения. Если же в лямбде присутствует ветвление, то на компилятор полагаться уже нельзя:
+\begin{lstlisting}[language=C++]
+[] (int n) 
+{ 
+    if (n % 2 == 0)
+        return n / 2.0;
+    else
+        return n * n;
+});
+\end{lstlisting}
+Компилятор не может самостоятельно вычислить тип возвращаемого значения, поэтому мы должны его указать явно:
+\begin{lstlisting}[language=C++]
+[] (int n) -> double // suffix return type
+{ 
+    if (n % 2 == 0)
+        return n / 2.0;
+    else
+        return n * n;
+});
+\end{lstlisting}
+\end{frame}
+
+\subsection{Default and delete}
+\hypertarget{Default and delete}{}
+\begin{frame}[fragile]{Default and delete}{Контроль поведения по умолчанию}
+Мы можем запрещать использование функций, а также заставлять использовать версии по умолчанию.
+\begin{lstlisting}[language=C++]
+class X {
+public:
+    X& operator=(const X&) = delete; // Запретили копирование.
+    X(const X&) = delete;
+};
+\end{lstlisting}
+\begin{lstlisting}[language=C++]
+class Y {
+public:
+    // Явно заставили использовать копирование по умолчанию.
+    Y& operator=(const Y&) = default; 
+    Y(const Y&) = default;
+};
+\end{lstlisting}
+\begin{lstlisting}[language=C++]
+struct Z {
+    Z(long long); // Может инициализироваться с long long,
+    Z(long) = delete; // но ни с чем больше.
+};
+\end{lstlisting}
+\end{frame}
+
+\subsection{Smart pointers}
+\hypertarget{Smart pointers}{}
+\begin{frame}[fragile]{Smart pointers}{Умные указатели - владение}
+\texttt{Unique\_ptr} - контейнер с семантикой владения. 
+\begin{enumerate}
+    \item Владеет объектом, на который указывает.
+    \item Запрещает копирование, но разрешает перемещение (move). 
+    \item При уничтожении указателя, уничтожается и объект, которым он владеет. 
+    \item Позволяет возвращать из функции объекты, выделенные на динамической памяти.
+    \item Кроме того корректно уничтожает такие объекты при раскрутке стека во время проталкивания исключений.
+    \item Опирается на rvalue семантику.
+\end{enumerate}
+\end{frame}
+\begin{frame}[fragile]{Smart pointers}{Умные указатели - владение}
+Примеры:
+\begin{lstlisting}[language=C++]
+unique_ptr<X> f()
+{
+    unique_ptr<X> p( new X );
+    // Можно кидать исключения, всё будет ок.
+    return p; // передали право владения наружу f()
+}
+void g()
+{
+    // Перемещаем с помощью move constructor.
+    unique_ptr<X> q = f(); 
+    q->memfct(2); // Используем q.
+    X x = *q; // Можео скопировать сам объект.
+} // q и объект, которым он владеет уничтожается при выходе.
+\end{lstlisting}
+\end{frame}
+\begin{frame}[fragile]{Smart pointers}{Умные указатели - разделяемое владение}
+\begin{enumerate}
+\item \texttt{Shared\_ptr} - контейнер с семантикой раздеяемого владения. 
+\item \texttt{Weak\_ptr} - контейнер, дополняющий \texttt{shared\_ptr}, нужен, чтобы не было циклических зависимостей и, соответственно, неумирающих объектов.\\ 
+\item \texttt{Shared\_ptr} реализован через счётчик ссылок, каждый \texttt{shared\_ptr}, указывающий на объект даёт \texttt{+1} к этому счётчику. 
+\item Если счётчик становится равен нулю, объект уничтожается. 
+\item \texttt{Weak\_ptr} не меняет счётчик ссылок.
+\item При неправильном использовании возможно возникновение циклических зависимостей.
+\item \texttt{Shared\_ptr} дорого стоит, особенно в параллельной среде.
+\end{enumerate}
+\end{frame}
+\begin{frame}[fragile]{Smart pointers}{Умные указатели - разделяемое владение}
+Иллюстрация к счётчику ссылок:
+\begin{lstlisting}[language=C++]
+void test()
+{
+    shared_ptr<int> p1(new int); // Счётчик равен 1.
+    {
+        shared_ptr<int> p2(p1); // Счётчик равен 2.
+        {
+            shared_ptr<int> p3(p1); // Счётчик равен 3.
+        } // Счётчик равен 2.
+    } // Счётчик равен 1.
+} // Счётчик равен 0, int уничтожается.
+
+\end{lstlisting}
+\end{frame}
+
+\subsection{Suffix return type}
+\hypertarget{Suffix return type}{}
+\begin{frame}[fragile]{Suffix return type}{Помощь в выводе типа возвращаемого значения}
+Иногда мы должны помочь компилятору вывести тип возвращаемого значения, без нас он этого сделать не может. Мы не можем написать \texttt{decltype( x * y )} где обычно (вместо \texttt{auto}), так как \texttt{x} и \texttt{y} там ещё не определены. Таким образом, эта штука нужна в основном именно для обхода области видимости. Используется в лямбдах.
+\begin{lstlisting}[language=C++]
+template<class T, class U>
+auto mul( T x, U y ) -> decltype( x * y )
+{
+    return x * y;
+}
+\end{lstlisting}
+\end{frame}
+
+\subsection{Override-final}
+\hypertarget{Override-final}{}
+\begin{frame}[fragile]{Override-final}{Явные виртуальные функции - override}
+\begin{lstlisting}[language=C++]
+struct B {
+    virtual void f();
+    virtual void g() const;
+    virtual void h(char);
+    void k(); // Не вирутальная.
+};
+struct D : B {
+    void f(); // Перезаписывает B::f().
+    void g();// Не перезаписывает B::g() (не та сигнатура).
+    virtual void h(char); // Перезаписывает B::h().
+    void k(); // Не перезаписывает B::k() (B::k() не виртуальна).
+};
+// Сейчас можно так
+struct D : B {
+    void f() override; // OK: overrides B::f().
+    void g() override; // Error: не та сигнатура.
+    virtual void h(char); // Перезаписывает B::h(), warning.
+    void k() override; // Error: B::k() не виртуальна.
+};
+\end{lstlisting}
+\end{frame}
+\begin{frame}[fragile]{Override-final}{Явные виртуальные функции - final}
+\begin{lstlisting}[language=C++]
+struct B {
+    // Говорим, что перезаписывать нельзя.
+    virtual void f() const final; 
+    virtual void g();
+};
+
+struct D : B {
+    // Error: D::f попытка перезаписи финальной B::f.
+    void f() const; 
+    void g(); // OK.
+};
+\end{lstlisting}
+\end{frame}
+
+
+
+\section{Исправление}
+
+\subsection{Right-angle brackets}
+\begin{frame}[fragile]{Right-angle brackets}{Пробел не нужен!}
+\begin{lstlisting}[language=C++]
+list<vector<string>> lvs;
+\end{lstlisting}
+Раньше была синтаксическая ошибка, теперь нет.
+\end{frame}
+
+\appendix
+\section<presentation>*{\appendixname}
+\subsection<presentation>*{Useful links}
+
+\begin{frame}[allowframebreaks]
+  \frametitle<presentation>{Полезные ссылки}
+    
+  \begin{thebibliography}{10}
+{
+  \beamertemplatebookbibitems
+  % Start with overview books.
+
+
+  \bibitem{C++11 - the new ISO C++ standard}
+  \texttt{C++11 - the new ISO C++ standard}
+  \newblock Bjarne Stroustrup
+  \newblock \href{http://stroustrup.com/C++11FAQ.html}{\texttt{http://www.stroustrup.com/C++11FAQ.html}}
+  
+  \bibitem{C++ Super-FAQ}
+   \texttt{C++ Super-FAQ}
+   \newblock Bjarne Stroustrup, Marshall Cline
+  \newblock \href{https://isocpp.org/faq}{\texttt{https://isocpp.org/faq}}
+  
+  \bibitem{C++11 draft}
+  \texttt{N3337 2012 Draft (C++11)}
+  \newblock ISO/IEC
+  \newblock \href{http://open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf}{\texttt{http://open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf}}
+  
+  \bibitem{Habr lambda}
+  \texttt{C++0x (С++11). Лямбда-выражения }
+  \newblock Сергей Олендаренко 
+  \newblock \href{https://habrahabr.ru/post/66021/}{\texttt{https://habrahabr.ru/post/66021/}}
+  
+  
+}
+    
+  \end{thebibliography}
+\end{frame}
+
+\end{document}
+
+

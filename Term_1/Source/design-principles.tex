@@ -1,0 +1,116 @@
+\documentclass[10pt]{beamer}
+
+\usetheme{CambridgeUS}
+\usepackage[english, russian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{etoolbox}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{wasysym}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{red},     % string literal style
+  showstringspaces=false,
+  morekeywords={include, printf},
+  texcl=true     %<---- added
+}
+
+
+\title[\href{https://goo.gl/NRgp8K}{https://goo.gl/NRgp8K} (Term 1)]{О принципах проектирования ПО (программного обеспечения)}
+\author[Гусев Илья, Булгаков Илья]{Гусев Илья, Булгаков Илья}
+\institute[МФТИ] 
+{Московский физико-технический институт\\*}
+\date{Москва, 2018}
+\subject{Computer Science}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Содержание}
+\tableofcontents
+\end{frame}
+
+\section{SOLID}
+\subsection{5 принципов SOLID}
+\begin{frame}[fragile]{SOLID}{5 принципов SOLID}
+    \begin{itemize}
+        \item \textbf{S}ingle Responsibility Principle (Принцип единственной обязанности)
+        \begin{itemize}
+            \item На каждый объект должна быть возложена единственная обязанность
+        \end{itemize}
+        \item \textbf{O}pen Сlosed Principle (Принцип открытости/закрытости)
+        \begin{itemize}
+            \item Программные сушности должны быть открыты для расширения, но закрыты для изменения
+        \end{itemize}
+        \item \textbf{L}iskov’s Substitution Principle (Принцип подстановки Барбары Лисков)
+        \begin{itemize}
+            \item Объекты в программе могут быть заменены наследниками без изменения свойств программы.
+        \end{itemize}
+        \item \textbf{I}nterface Segregation Principle (Принцип разлеления интерфейсов)
+        \begin{itemize}
+            \item Много специализированных интерфейсов лучше, чем один универсальный.
+        \end{itemize}
+        \item \textbf{D}ependency Inversion Principle (Принцип инверсии зависимостей)
+        \begin{itemize}
+            \item Зависимости внутри системны строятся на основе абстраций. Модули верхнего уровня не зависят от модулей нижнего уровня. Абстрации не должны зависеть от деталей. Детали зависят от абстраций.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\section{YAGNI}
+\subsection{«You aren't gonna need it» - «Вам это не понадобится»}
+\begin{frame}[fragile]{YAGNI}{«You aren't gonna need it» - «Вам это не понадобится»}
+
+YAGNI - процесс и принцип проектирования ПО, при котором в качестве основной цели и/или ценности декларируется отказ добавления функциональности, в которой нет непосредственной надобности.
+Помогает избежать последствий:
+    \begin{itemize}
+        \item Тратится время, которое было бы затрачено на добавление, тестирование и улучшение необходимой функциональности.
+        \item Новые функции должны быть отлажены, документированы и сопровождаться.
+        \item Новая функциональность ограничивает то, что может быть сделано в будущем, — ненужные новые функции могут впоследствии помешать добавить новые нужные.
+        \item Пока новые функции не нужны — трудно  предугадать, что они должны делать, и протестировать их. Это ведет к неизебжному изменению и усложнению в будущем.
+    \end{itemize}
+\end{frame}
+
+\section{KISS}
+\subsection{«Keep it simple stupid» - «Делайте вещи проще»}
+\begin{frame}[fragile]{KISS}{«Keep it simple stupid» - «Делайте вещи проще»}
+
+KISS - принцип проектирования, который утверждает, что большинство систем работают лучше всего, если они остаются простыми, а не усложняются.
+
+Как применять:
+    \begin{itemize}
+        \item Разбивайте задачи на подзадачи. Оптимальное время решение - 4-12 часов.
+        \item Каждая задача должна решаться одним или парой классов
+        \item Каждый метод должен состоять не более чем из 30-40 строк. Метод должен решать одну конкретную задачу. Если в вашем методе множество условий, разбейте его на несколько. Это повысит читаемость, поддерживаемость кода.
+        \item Классы должны иметь небольшой размер.
+        \item Сначала придумайте решение, потом напишите код. 
+        \item Не бойтесь избавляться от кода. Если вы столкнулись с новыми требованиями - порой лучше придумать новое более изящное решение решающее и старые и новые задачи.
+    \end{itemize}
+\end{frame}
+
+\section{DRY}
+\subsection{«Don’t repeat yourself» - «Не повторяйся»}
+\begin{frame}[fragile]{DRY}{«Don’t repeat yourself» - «Не повторяйся»}
+
+DRY - Это принцип разработки программного обеспечения, нацеленный на снижение повторения информации различного рода, особенно в системах со множеством слоёв абстрагирования.
+
+Каждая часть знания должна иметь единственное, непротиворечивое и авторитетное представление в рамках системы
+
+\end{frame}
+
+\end{document}
+
+
