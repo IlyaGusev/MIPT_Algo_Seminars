@@ -7,7 +7,10 @@
 \usepackage{etoolbox}
 \usepackage{multicol}
 \usepackage{listings}
-\usepackage{color}
+\usepackage{wasysym}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \lstset{
@@ -23,11 +26,11 @@
 }
 
 
-\title[\href{https://goo.gl/NRgp8K}{https://goo.gl/NRgp8K} (Term 3)]{Руководство по Git}
+\title[\href{https://goo.gl/NRgp8K}{https://goo.gl/NRgp8K} (Term 1)]{Руководство по Git}
 \author[Гусев Илья]{Гусев Илья}
 \institute[МФТИ] 
 {Московский физико-технический институт\\*}
-\date{Москва, 2017}
+\date{Москва, 2018}
 \subject{Computer Science}
 
 \begin{document}
@@ -86,9 +89,23 @@
 \end{frame}
 
 \begin{frame}[fragile]{VCS}{Что такое VCS (система контроля версий)?}
-Система контроля версий - софт, который позволяет работать в рамках таких сложных сценариев, когда десятки людей вносят изменения в одни и те же файлы. В сочетании с CI (Continuous Integration, непрерывная интеграция) - основа инфраструктуры при разработке почти любого программного продукта. 
+\begin{itemize}
+    \item Программа для отслеживания изменений в файлах
+    \item Необходима, когда код редактирует больше 1 человека
+    \item Полезна, когда код редактирует даже 1 человек
+    \item Полезна не только в случае кода
+\end{itemize}
+\end{frame}
 
-Можно использовать не только над исходным кодом, а в принципе над любыми текстовыми файлами (и не только текстовыми).
+\begin{frame}[fragile]{Понятия}
+\begin{itemize}
+    \item Репозиторий (репо) - набор файлов и истории их изменений
+    \item Ветка - набор конкретных изменений
+    \item Коммит - фиксированное и сохранённое состояние файлов
+    \item Закоммитить - сделать какие-то изменения и зафиксировать их
+    \item Запушить - отправить коммит на удалённый сервер
+    \item Откатить - перенестись на какой-то старый коммит
+\end{itemize}
 \end{frame}
 
 \subsection{Варинты VCS}
@@ -100,6 +117,14 @@
 \end{enumerate}
 \end{frame}
 
+\begin{frame}[fragile]{Не путайте!}{Git vs GitHub}
+\begin{itemize}
+    \item Git - система контроля версий, консольная утилита
+    \item GitHub - сайт, на котором можно хранить репозитории Git'а
+    \item Bitbucket - другой такой сайт с бесплатной возможностью создания закрытых репо
+\end{itemize}
+\end{frame}
+
 \section{Git}
 \subsection{Установка}
 
@@ -108,10 +133,10 @@
 \item Скачивание: \href{https://git-scm.com/downloads}{\texttt{https://git-scm.com/downloads}}
 \item Установка...
 \item Первоначальная настройка: \\
-\texttt{git config --global user.name <ваше имя>}\\
-\texttt{git config --global user.email <ваша почта>}\\
-\texttt{git config --global core.editor <ваш любимый редактор>}\\
-\texttt{git config --list}
+\texttt{git config ---global user.name <ваше имя>}\\
+\texttt{git config ---global user.email <ваша почта>}\\
+\texttt{git config ---global core.editor <ваш любимый редактор>}\\
+\texttt{git config ---list}
 \end{enumerate}
 \end{frame}
 
@@ -134,9 +159,9 @@
 \item Добавление файла в индекс:\\
 \texttt{git add <имя файла> }\\
 \item Добавление всех файлов в индекс:\\
-\texttt{git add -a }\\
+\texttt{git add -A }\\
 \item Удаление файла из индекса:\\
-\texttt{git rm <имя файла> }\\
+\texttt{git rm ---cached <имя файла> }\\
 \item Фиксация изменений\\
 \texttt{git commit -m "Сообщение при коммите" }\\
 \item Добавление всех файлов + фиксация\\
@@ -168,7 +193,7 @@ doc/**/*.txt
 \begin{frame}[fragile]{Git}{Отмена изменений}
 \begin{enumerate}
 \item Исправление последнего коммита:\\
-\texttt{git commit --amend}\\
+\texttt{git commit ---amend}\\
 Пример:\\
 \texttt{git commit -m "Сообщение при коммите"}\\
 \texttt{git add <забытый файл>}\\

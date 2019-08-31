@@ -1,0 +1,165 @@
+\documentclass[10pt]{beamer}
+
+\usetheme{CambridgeUS}
+\usepackage[english, russian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{etoolbox}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{wasysym}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{red},     % string literal style
+  showstringspaces=false,
+  morekeywords={include, printf},
+  texcl=true     %<---- added
+}
+
+
+\title[\href{https://goo.gl/NRgp8K}{https://goo.gl/NRgp8K} (Term 1)]{Реализация умных указателей}
+\author[Гусев Илья, Булгаков Илья]{Гусев Илья, Булгаков Илья}
+\institute[МФТИ] 
+{Московский физико-технический институт\\*}
+\date{Москва, 2019}
+\subject{Computer Science}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Содержание}
+\tableofcontents
+\end{frame}
+
+\section{Реализация умных указателей}
+
+\begin{frame}[fragile]{ScopedPtr}
+
+\begin{itemize}
+    \item Простой умный указатель: для хранения на стеке или в классе.
+    \item Единственные владелец.
+    \item Нельзя копировать и присваивать.
+    \item Нельзя вернуть владение объектом.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{ScopedPtr. Основные методы}
+
+\begin{itemize}
+    \item get — возвращает указатель, сохраненный внутри ScopedPtr (например, чтобы передать его в какую-то функцию)
+    \item release — забирает указатель у ScopedPtr и возвращает значение этого указателя, после вызова release ScopedPtr не должен освобождать память (например, чтобы вернуть этот указатель из функции)
+    \item reset — метод заставляет ScopedPtr освободить старый указатель, а вместо него захватить новый (например, чтобы переиспользовать ScopedPtr, так как оператор присваивания запрещен)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{ScopedPtr. Задача}
+Напишите реализацию методов для ScopedPtr
+\begin{lstlisting}
+struct Expression;
+
+struct ScopedPtr
+{
+    // TODO
+    //
+    //explicit ScopedPtr(Expression *ptr = 0);
+    //~ScopedPtr();
+    //Expression* get() const;
+    //Expression* release();
+    //void reset(Expression *ptr = 0);
+    //Expression& operator*() const;
+    //Expression* operator->() const;
+private:
+    ScopedPtr(const ScopedPtr&);
+    ScopedPtr& operator=(const ScopedPtr&);
+
+    Expression *ptr_;
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{ScopedPtr. Реализация}
+
+\begin{lstlisting}
+struct Expression;
+
+struct ScopedPtr
+{
+    explicit ScopedPtr(Expression *ptr = 0) { ptr_ = ptr; }
+    ~ScopedPtr() { delete ptr_; }
+    Expression* get() const { return ptr_; }
+    Expression* release() { Expression *temp = ptr_; ptr_ = 0; return temp; }
+    void reset(Expression *ptr = 0) { if(ptr == ptr_) { return; } else { delete ptr_; ptr_ = ptr; } }
+    Expression& operator*() const { return *ptr_; }
+    Expression* operator->() const { return ptr_; }
+private:
+    ScopedPtr(const ScopedPtr&);
+    ScopedPtr& operator=(const ScopedPtr&);
+
+    Expression *ptr_;
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{SharedPtr}
+
+Умный указатель с подсчетом ссылок 
+
+\begin{lstlisting}
+{
+    SharedPtr sp1( new Expression() );
+    SharedPtr sp2(sp1);
+}
+\end{lstlisting}
+
+Особенности:
+
+\begin{itemize}
+    \item Для разделяемых объектов.
+    \item Ведётся подсчёт ссылок.
+    \item Нельзя вернуть владение объектом.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{SharedPtr. Задание}
+
+Напишите реализацию методов для SharedPtr
+
+\begin{lstlisting}
+struct Expression;
+struct Number;
+struct BinaryOperation;
+
+struct SharedPtr
+{
+    // TODO
+    //
+    // explicit SharedPtr(Expression *ptr = 0)
+    // ~SharedPtr()
+    // SharedPtr(const SharedPtr &)
+    // SharedPtr& operator=(const SharedPtr &)
+    // Expression* get() const
+    // void reset(Expression *ptr = 0)
+    // Expression& operator*() const
+    // Expression* operator->() const
+};
+\end{lstlisting}
+\end{frame}
+
+\end{document}
+
+

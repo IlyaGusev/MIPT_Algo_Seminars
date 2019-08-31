@@ -1,0 +1,14 @@
+.reveal p {
+  font-family: 'Raleway', sans-serif;
+  # color: #2d28cc;
+}
+
+
+body {
+  font-family: Raleway, sans-serif;
+  padding: 5px 0 5px 5px;
+}
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+  font-family: 'Droid Sans Mono', 'sans-serif';
+}

@@ -29,6 +29,27 @@
 
 \section{Введение}
 
+\subsection{Преподаватели}
+
+\begin{frame}{Преподаватели: Илья Булгаков}
+\textbf{Илья Булгаков}:
+\begin{itemize}
+    \item 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Преподаватели: Илья Гусев}
+\textbf{Илья Гусев}:
+\begin{itemize}
+    \item Выпускник ФИВТ МФТИ (бакалавриат в 2016, магистратура в 2018)
+    \item Аспирант на кафедре компьютерной лингвистики МФТИ
+    \item Преподаватель кафедры алгоритмов и технологий программирования (АТП) с 2016 года, кафедры компьюетрной лингвистики с 2017 года.
+    \item Бэкенд-разработчик в ABBYY LingvoLive в 2016-2017 годах, десктоп-разработчик в группе разработки инструментов машинного обучения в ABBYY в 2017-2018 годах, инженер в области машинного обучения в группе качества Яндекс.Новостей с 2018 года по настоящее время
+    \item Профессиональные интересы: глубокое обучение (deep learning) и обработка естественных языков (NLP)
+    \item \href{https://github.com/IlyaGusev/}{https://github.com/IlyaGusev/}
+\end{itemize}
+\end{frame}
+
 \subsection{Структура курса}
 \begin{frame}[fragile]{Структура курса}
 \begin{enumerate}
@@ -53,6 +74,7 @@
 \end{enumerate}
 Итого: 3 экзамена, 3 зачёта, 4 ак. часа в неделю на протяжении 3 семестров
 \end{frame}
+
 
 \subsection{Правила зачёта}
 \begin{frame}[fragile]{Правила зачёта}{Оценки}
@@ -84,7 +106,7 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Правила зачёта}{Посещаемость, списывание, кодстайл}
+\begin{frame}[fragile]{Правила зачёта}{Посещаемость, списывание}
 \begin{itemize}
 \item Про посещаемость: она напрямую не влияет на оценку
 \item Про списывание: любое дублирование чужого кода штрафуется -5 и незачётом по задаче
@@ -102,133 +124,96 @@
 \end{itemize}
 \end{frame}
 
-\section{Про компьютеры}
-\subsection{Транзисторы $\rightarrow$ Процессор}
-\begin{frame}[fragile]{Транзисторы $\rightarrow$ Логические элементы}
+\section{Языки программирования}
+\subsection{Языки программирования}
+\begin{frame}{Компьютер}
+\begin{center}
+\includegraphics[width=6cm, height=7cm]{Term_1/Source/Pirctures/not_good.jpg}
+\end{center}
+\end{frame}
+
+\begin{frame}{Компьютер}
+\begin{enumerate}
+    \item Железо
+    \item Драйверы
+    \item Операционная система
+    \item Языки программирования и библиотеки программ
+    \item Пользовательские программы
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Языки программирования}
+Компьютер:
+\begin{enumerate}
+    \item Не понимает человеческих команд и желаний
+    \item Оперирует 1 и 0
+    \item Может складывать/вычитать/умножать числа, считывать данные из ячейки памяти и записывать их в ячейку памяти
+    \item Архитектура фон Неймана
+\end{enumerate}
+
+Язык программирования - прослойка между желаниями человека и компьютером
+\end{frame}
+
+\begin{frame}{Языки программирования}
 \begin{itemize}
-\item \href{http://www.cs.bu.edu/~best/courses/modules/Transistors2Gates/}{http://www.cs.bu.edu/$\sim$best/courses/modules/Transistors2Gates/}
-\item \href{https://www.reddit.com/r/compsci/comments/209fqx/i_want_to_know_how_the_computer_works_from/}{Reddit topic: https://bit.ly/2CdBk3u}
-\item \href{https://habr.com/post/338584/}{Реализация «Тетриса» в игре «Жизнь»: https://habr.com/post/338584/}
+    \item 'Старые': Lisp, Cobol, Fortran, Basic, Pascal, Ada, ...
+    \item Основные: C, C++, Java, Python, C\#, Javascript, PHP, ...
+    \item Молодые: Go, Rust, Swift, Kotlin, Scala, ...
+    \item Нишевые: Haskell, Clojure, Erlang, D, F\#, ...
+    \item Эзотерические: Brainfuck, Whitespace, Shakespeare, FiM++, ...
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Транзисторы $\rightarrow$ Логические элементы}
-\begin{multicols}{2}
-\includegraphics[width=3cm, height=4cm]{Term_1/Source/Pirctures/transistor-n.png}
-\includegraphics[width=3cm, height=4cm]{Term_1/Source/Pirctures/transistor-p.png}
-\includegraphics[width=6cm, height=4cm]{Term_1/Source/Pirctures/transistor-as-faucet.png}
-\end{multicols}
+\subsection{Почему C++?}
+\begin{frame}{Почему C++?}
+\begin{enumerate}
+    \item Универсальность: компиляторы под любую платформу
+    \item Сообщество: широкая поддержка, новые стандарты, отличные книжки и документация, поддержка в IDE
+    \item Низкоуровневость: ручное управление памятью по умолчанию, скорость исполнения
+    \item Сложность: если выучили C++, то остальное будет легко
+    \item Популярный синтаксис: Java, C#, Javascript имеют Си-подобный синтаксис
+    \item Востребованность: огромное наследие; использование в больших корпорациях; языки операционных систем и драйверов; в ближайшие 5-10 лет точно актуальны
+\end{enumerate}
 \end{frame}
 
-\begin{frame}[fragile]{Транзисторы $\rightarrow$ Логические элементы}{NOT}
-\includegraphics[width=6cm, height=6cm]{Term_1/Source/Pirctures/not-circuit.png}
+\begin{frame}{Почему НЕ C++?}
+\begin{enumerate}
+    \item "Так исторически сложилось": много решений в дизайне языков принимались впервые и иногда неправильно; много противоречивых концепций 
+    \item Перегруженный синтаксис: во многих языках программы будут в 2-100 раз короче; в "Hello world!" на С++ есть МНОГО непонятных вещей
+    \item Отсутствие менеджера пакетов: сложно подключать внешние библиотеки, а значит сложно сделать что-то прикладное
+\end{enumerate}
+
+Замены C++: C\#, Rust, Go
 \end{frame}
 
-\begin{frame}[fragile]{Транзисторы $\rightarrow$ Логические элементы}{NAND}
-\begin{multicols}{2}
-\includegraphics[width=5cm, height=7cm]{Term_1/Source/Pirctures/nand-circuit.png}
-\vfill\eject
-\begin{tabular}{ c|c|c } 
-X &	Y & Z \\ 
-  \hline
-0 & 0 & 1\\
-  \hline
-0 & 1 & 1 \\
- \hline
-1 & 0 & 1 \\
- \hline
-1 & 1 & 0 \\
-\end{tabular}
-\end{multicols}
+\begin{frame}{Профессии}
+Алгоритмы нужны любому разработчику, любому аналитику и любому менеджеру в IT. \\
+\\
+C необходим:
+\begin{enumerate}
+    \item Разработчику встраиваемых систем
+    \item Системному инженеру
+\end{enumerate}
+
+С++ необходим:
+\begin{enumerate}
+    \item Десктоп-разработчику
+    \item Разработчику распределённых систем
+    \item Разработчику игр
+\end{enumerate}
+
+C++ может пригодится:
+\begin{enumerate}
+    \item Бэкенд-разработчику
+    \item Мобильному разработчику
+\end{enumerate}
 \end{frame}
 
-\begin{frame}[fragile]{Транзисторы $\rightarrow$ Логические элементы}{NOR}
-\begin{multicols}{2}
-\includegraphics[width=5cm, height=7cm]{Term_1/Source/Pirctures/nor-circuit.png}
-\vfill\eject
-\begin{tabular}{ c|c|c } https://v2.overleaf.com/project/5849e163e473d1cf1e4b641d
-X &	Y & Z \\ 
-  \hline
-0 & 0 & 1\\
-  \hline
-0 & 1 & 0 \\
- \hline
-1 & 0 & 0 \\
- \hline
-1 & 1 & 0 \\
-\end{tabular}
-\end{multicols}
+\begin{frame}[fragile]{Зарплаты}
+\includegraphics[width=10cm, height=7cm]{Term_1/Source/Pirctures/salaries.png}\\
+\href{https://habr.com/ru/company/moikrug/blog/461855/}{https://habr.com/ru/company/moikrug/blog/461855/}
 \end{frame}
 
-\begin{frame}[fragile]{Логические элементы $\rightarrow$ Сумматор}{AND, OR, XOR}
-\begin{multicols}{2}
-\includegraphics[width=4cm, height=3cm]{Term_1/Source/Pirctures/and.jpg}\\
-\includegraphics[width=4cm, height=3cm]{Term_1/Source/Pirctures/or.jpg}
-\vfill\eject
-\includegraphics[width=4cm, height=3cm]{Term_1/Source/Pirctures/xor.jpg}
-\end{multicols}
-\end{frame}
-
-
-\begin{frame}[fragile]{Логические элементы $\rightarrow$ Сумматор}{Half and full adder}
-\begin{multicols}{2}
-\includegraphics[width=4cm, height=3cm]{Term_1/Source/Pirctures/Half_Adder.png}
-\vfill\eject
-\includegraphics[width=4cm, height=3cm]{Term_1/Source/Pirctures/Full_Adder.png}
-\end{multicols}
-\end{frame}
-
-\begin{frame}[fragile]{Логические элементы $\rightarrow$ Сумматор}{Линейный каскадный сумматор}
-\includegraphics[width=8cm, height=3cm]{Term_1/Source/Pirctures/Ripple_carry_adder.png}
-\end{frame}
-
-
-\subsection{Память}
-\begin{frame}[fragile]{Память}
-\includegraphics[width=12cm, height=7cm]{Term_1/Source/Pirctures/latency.png}
-\end{frame}
-
-\subsection{Архитектура фон Неймана}
-\begin{frame}[fragile]{Архитектура фон Неймана}
-\begin{itemize}
-    \item Работа компьютера контролируется программой, состоящей из набора команд
-    \item Принцип последовательного выполнения: после выполнения текущей команды IP (instruction pointer) автоматически указывает на следующую
-    \item Принцип однородности: в памяти хранятся и данные, и команды
-    \item Принцип адресуемости: память состоит из ячеек, каждая имеет уникальный «адрес»
-    \item Использование двоичной системы счисления * (\href{https://habr.com/post/166679/}{https://habr.com/post/166679/})
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Архитектура фон Неймана}
-\includegraphics[width=7cm, height=7cm]{Term_1/Source/Pirctures/fon.jpg}
-\end{frame}
-
-\begin{frame}[fragile]{Архитектура фон Неймана}
-\includegraphics[width=12cm, height=5cm]{Term_1/Source/Pirctures/math-fon.jpg}\\
-Принцип хранимой программы: $\forall c \in Command, \exists v \in Value : decode(v) = c $
-Текущая операция: $operation = decode(state(state(ip)))$
-\end{frame}
-
-
-\begin{frame}[fragile]{Архитектура фон Неймана}{Пример}
-\includegraphics[width=12cm, height=4cm]{Term_1/Source/Pirctures/example.jpg}
-\end{frame}
-
-\begin{frame}[fragile]{Архитектура фон Неймана}{Пример}
-\includegraphics[width=12cm, height=4cm]{Term_1/Source/Pirctures/example1.jpg}
-\end{frame}
-
-\begin{frame}[fragile]{Архитектура фон Неймана}{Пример}
-\includegraphics[width=12cm, height=4cm]{Term_1/Source/Pirctures/example2.jpg}
-\end{frame}
-
-\begin{frame}[fragile]{Архитектура фон Неймана}{Пример}
-\includegraphics[width=12cm, height=4cm]{Term_1/Source/Pirctures/example3.jpg}
-\end{frame}
-
-\begin{frame}[fragile]{Архитектура фон Неймана}{Пример}
-\includegraphics[width=12cm, height=5cm]{Term_1/Source/Pirctures/example-run.jpg}
-\end{frame}
 
 \section{Язык Си}
 \subsection{Свойства языка}
@@ -251,6 +236,11 @@ X &	Y & Z \\
 
 \begin{frame}[fragile]{Указатели}
 \includegraphics[width=8cm, height=5cm]{Term_1/Source/Pirctures/c-var-ptr.png}
+\end{frame}
+
+\subsection{IDE}
+\begin{frame}[fragile]{IDE}
+F
 \end{frame}
 
 \appendix
@@ -305,6 +295,32 @@ X &	Y & Z \\
   \bibitem{Хабр}
   \texttt{Хабр}
   \newblock \href{https://habr.com/}{\texttt{https://habr.com/}}
+  
+  \bibitem{Хабр: Зарплаты в ИТ в первом полугодии 2019 года}
+  \texttt{Хабр: Зарплаты в ИТ в первом полугодии 2019 года}
+  \newblock \href{https://habr.com/ru/company/moikrug/blog/461855/}{\texttt{https://habr.com/ru/company/moikrug/blog/461855/}}
+  
+  \bibitem{Исследования Яндекса - Обзор рынка ИТ-вакансий}
+  \texttt{Исследования Яндекса - Обзор рынка ИТ-вакансий}
+  \newblock \href{https://yandex.ru/company/researches/2019/it-jobs}{\texttt{https://yandex.ru/company/researches/2019/it-jobs}}
+  
+  \bibitem{StackOverflow: Developer Survey Results
+2018}
+  \texttt{StackOverflow: Developer Survey Results
+2018}
+  \newblock \href{https://insights.stackoverflow.com/survey/2018}{\texttt{https://insights.stackoverflow.com/survey/2018}}
+  
+  \bibitem{Хабр: Преимущества C++ как первого языка для обучения программированию}
+  \texttt{Хабр: Преимущества C++ как первого языка для обучения программированию}
+  \newblock \href{https://habr.com/ru/post/202466/}{\texttt{https://habr.com/ru/post/202466/}}
+  
+  \bibitem{Хабр: Ликбез по типизации в языках программирования}
+  \texttt{Хабр: Ликбез по типизации в языках программирования}
+  \newblock \href{https://habr.com/ru/post/161205/}{\texttt{https://habr.com/ru/post/161205/}}
+  
+  \bibitem{Career levels across companies}
+  \texttt{Career levels across companies}
+  \newblock \href{https://www.levels.fyi/}{\texttt{https://www.levels.fyi/}}
 
 }
 
